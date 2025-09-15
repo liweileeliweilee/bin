@@ -103,10 +103,10 @@ echo "bash_cmd<${bash_cmd}>"
 #-------------------------------------------
 # system monitor
 #-------------------------------------------
-#echo -e "\033[47;30m\nSystem monitor${Color_Off}"
-#bash_cmd="gnome-system-monitor &"
-#echo "bash_cmd<${bash_cmd}>"
-#/bin/bash -c "${bash_cmd}" || exit 1
+echo -e "\033[47;30m\nSystem monitor${Color_Off}"
+bash_cmd="gnome-system-monitor &"
+echo "bash_cmd<${bash_cmd}>"
+/bin/bash -c "${bash_cmd}" || exit 1
 
 #-------------------------------------------
 # logitech
