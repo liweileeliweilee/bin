@@ -88,7 +88,7 @@ echo -e "${Color_Off}"
 # upgrade apt
 #-------------------------------------------
 echo -e "\033[47;30m\nUpgrading APT packages${Color_Off}"
-bash_cmd="sudo apt update -y && sudo apt dist-upgrade -y && sudo apt autoremove -y"
+bash_cmd="sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y"
 echo "bash_cmd<${bash_cmd}>"
 /bin/bash -c "${bash_cmd}" || exit 1
 
