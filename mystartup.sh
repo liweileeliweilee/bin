@@ -93,6 +93,19 @@ echo "bash_cmd<${bash_cmd}>"
 /bin/bash -c "${bash_cmd}" || exit 1
 
 #-------------------------------------------
+# upgrade dkms
+#-------------------------------------------
+# upgrade r8125-dkms
+echo -e "\033[47;30m\nUpgrading dkms${Color_Off}"
+bash_cmd="sudo apt install -y r8125-dkms"
+echo "bash_cmd<${bash_cmd}>"
+/bin/bash -c "${bash_cmd}" || exit 1
+# rebuild dkms modules if needed
+bash_cmd="sudo dkms autoinstall"
+echo "bash_cmd<${bash_cmd}>"
+/bin/bash -c "${bash_cmd}" || exit 1
+
+#-------------------------------------------
 # upgrade flatpak
 #-------------------------------------------
 echo -e "\033[47;30m\nUpgrading Flatpak applications${Color_Off}"
