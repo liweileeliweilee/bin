@@ -130,6 +130,23 @@ echo "bash_cmd<${bash_cmd}>"
 #/bin/bash -c "${bash_cmd}" || exit 1
 
 #-------------------------------------------
+# Clean old global IPv6 address and NDP/route cache
+#-------------------------------------------
+echo -e "\033[47;30m\nClean old global IPv6 address and NDP/route cache${Color_Off}"
+
+bash_cmd="sudo ip -6 addr flush dev vmbr0 scope global"
+echo "bash_cmd<${bash_cmd}>"
+/bin/bash -c "${bash_cmd}" || exit 1
+
+bash_cmd="sudo ip -6 neigh flush dev vmbr0"
+echo "bash_cmd<${bash_cmd}>"
+/bin/bash -c "${bash_cmd}" || exit 1
+
+bash_cmd="sudo ip -6 route flush cache"
+echo "bash_cmd<${bash_cmd}>"
+/bin/bash -c "${bash_cmd}" || exit 1
+
+#-------------------------------------------
 # Complete
 #-------------------------------------------
 echo -e "${On_Blue}\n"
