@@ -2,24 +2,28 @@
 # 20240213: add echo "[Line:${LINENO}]"
 #
 # 20241202:
-# 	add verify_dirname
-# 	add 複製整個目錄：判斷最後一個字元'*'
+#      add verify_dirname
+#      add 複製整個目錄：判斷最後一個字元'*'
 #
 # 20250215: add error_lines.txt
 #
 # 20250216:
-# 	判斷verify_dir已經有該目錄或檔案，就不輸出到error_lines.txt
-#	add current_file
+#      判斷verify_dir已經有該目錄或檔案，就不輸出到error_lines.txt
+#     add current_file
 #
 # 20250216_2:
-# 	add remove_Finish_dir_file and remove_base_dir_file
+#      add remove_Finish_dir_file and remove_base_dir_file
 #
+# 20260113: 
+#      add error_lines.txt check feature (Red Alert)
 #########################################################################################
 
 echo "[Line:${LINENO}]"
 Color_Off='\033[0m'       # Text Reset
 On_IBlack='\033[0;100m'   # Black
 On_Blue='\033[44m'        # Blue
+On_Red='\033[41m'         # Red Background (New)
+White='\033[97m'          # White Text (New)
 
 echo -e "${On_IBlack}\n"
 echo -e "Starting: <${0}>"
@@ -33,6 +37,15 @@ echo "Working dir: ${base_dir}"
 finish_dir="${base_dir}/Finish"
 echo "Finish dir: ${finish_dir}"
 
+# =======================================================
+# 20260113 [新增功能] 記錄執行前的 error_lines.txt 行數
+# =======================================================
+error_log_file="${base_dir}/error_lines.txt"
+init_err_count=0
+if [ -f "${error_log_file}" ]; then
+    init_err_count=$(wc -l < "${error_log_file}")
+fi
+# =======================================================
 
 if [ "${1}" == ""  ]; then
 echo "[Line:${LINENO}]"
@@ -95,16 +108,16 @@ do
 #########################################################################################
 echo "[Line:${LINENO}]"
           verify_file=""$verify_dir"/"$current_file""
-	  echo "<mv files>: $working_files"
-	  echo "<verify_file>: $verify_file"
-	  
-	  if [ "$working_files" ] && [ ! -f "$verify_file" ]; then
-#20250216	  if [ "$working_files" ]; then
-	    echo "-=-=-=-=-=-=-=-=-=-=-=-=-="
-	    echo "pwd:<$(pwd)>"
-#	    echo "mkdir -p $verify_dir"
-#	    echo "cp -t $verify_dir $working_files"
-#	    mkdir -p "$verify_dir"
+      echo "<mv files>: $working_files"
+      echo "<verify_file>: $verify_file"
+       
+      if [ "$working_files" ] && [ ! -f "$verify_file" ]; then
+#20250216       if [ "$working_files" ]; then
+        echo "-=-=-=-=-=-=-=-=-=-=-=-=-="
+        echo "pwd:<$(pwd)>"
+#        echo "mkdir -p $verify_dir"
+#        echo "cp -t $verify_dir $working_files"
+#        echo "mkdir -p "$verify_dir"
 
             bash_cmd="mv -t \""${verify_dir}"\" "${working_files}""
             #20240213 bash_cmd="mv -t ""${verify_dir}"" "${working_files}""
@@ -116,7 +129,7 @@ echo "[Line:${LINENO}]"
             #"$bash_cmd"
 echo "[Line:${LINENO}]"
 
-	  fi
+      fi
 #########################################################################################
 
 
@@ -143,7 +156,7 @@ echo "[Line:${LINENO}]"
         verify_dir="${finish_dir}/Verified${dir_name}"
 #        verify_dir="${finish_dir}/Verified/${dir_name}"
         verify_parent_dir=${verify_dir%/*}
-	verify_dirname="$(dirname "$verify_dir")"
+    verify_dirname="$(dirname "$verify_dir")"
         echo "verify dirname: "\"$verify_dirname\"""
         echo "verify basename: "\""$(basename "$verify_dir")"\"""
         echo "verify_dir \"$verify_dir\""
@@ -162,13 +175,13 @@ echo "[Line:${LINENO}]"
 
           working_dir="${finish_dir}${dir_name}"
           echo "working dir: ${working_dir}"
-	
+       
           bash_cmd="mv \""$working_dir"\" \""$verify_parent_dir"\""
           echo "===> bash_cmd<${bash_cmd}>"
           /bin/bash -c "${bash_cmd}" || echo "$line" >> "${base_dir}/error_lines.txt"
           #20250215 /bin/bash -c "${bash_cmd}" || exit 1
           #20240112
-	  #echo "mv -f \"$working_dir\" \"$verify_parent_dir\""
+      #echo "mv -f \"$working_dir\" \"$verify_parent_dir\""
           #mv "$working_dir" "$verify_parent_dir" || exit 1
           #echo "mv -f '$working_dir' '$verify_parent_dir'"
         
@@ -182,7 +195,7 @@ echo "[Line:${LINENO}]"
         echo "working_files: <${working_files}>"
         
         #20250216 add
-	current_file="$(basename "$line")"
+    current_file="$(basename "$line")"
         echo "current_file: <${current_file}>"
         fi
       fi
@@ -203,11 +216,11 @@ echo "[Line:${LINENO}]"
 
       if [ -d "$working_dir" ]; then
 echo "[Line:${LINENO}]"
-#      cd "$working_dir"	
+#      cd "$working_dir"    
 #      if [ $? -eq 0 ]; then
-        cd "$working_dir"	
+        cd "$working_dir"    
         echo "pwd:<$(pwd)>"
-	 working_dir_exist=1
+      working_dir_exist=1
         verify_dir="${finish_dir}/Verified${dir_name}"
 #        verify_dir="${finish_dir}/Verified/${dir_name}"
         echo "verify dir: ${verify_dir}"
@@ -291,31 +304,31 @@ echo "[Line:${LINENO}]"
 
     *)
 echo "[Line:${LINENO}]"
-	  if [ $working_dir_exist -eq 1 ]; then
+      if [ $working_dir_exist -eq 1 ]; then
 echo "[Line:${LINENO}]"
 
             #從Finish搬到Verify
-	    ##20230117 echo "mv -t '$verify_dir' '${line}'"
-	    ##20230117 mv -t "$verify_dir" "$line"
+        ##20230117 echo "mv -t '$verify_dir' '${line}'"
+        ##20230117 mv -t "$verify_dir" "$line"
 
             #注意：反向從Verify搬到Finish
-	    #echo "mv '$verify_dir/${line}' '$working_dir/${line}'"
-	    #mv "$verify_dir/$line" "$working_dir/$line"
+        #echo "mv '$verify_dir/${line}' '$working_dir/${line}'"
+        #mv "$verify_dir/$line" "$working_dir/$line"
 
             #從Finish拷貝到Verify
-	    #echo "cp -t '$verify_dir' '${line}'"
-	    #cp -t "$verify_dir" "$line"
+        #echo "cp -t '$verify_dir' '${line}'"
+        #cp -t "$verify_dir" "$line"
 
 
 
-	    working_files="${working_files}"\""${line}"\"" "
-	    #20240112 working_files="${working_files}"\'"${line}"\'" "
-	    ##20230117 working_files="${working_files}"\'"${working_dir}"/"${line}"\'" "
-	    #working_files="$working_files""$line"" "
+        working_files="${working_files}"\""${line}"\"" "
+        #20240112 working_files="${working_files}"\'"${line}"\'" "
+        ##20230117 working_files="${working_files}"\'"${working_dir}"/"${line}"\'" "
+        #working_files="$working_files""$line"" "
             echo "${line}"
             ##20230117 echo "${working_dir}/${line}"
 echo "[Line:${LINENO}]"
-	  fi
+      fi
       ;;
   esac
 done < "$input_file"
@@ -324,17 +337,17 @@ done < "$input_file"
 #########################################################################################
 echo "[Line:${LINENO}]"
           verify_file=""$verify_dir"/"$current_file""
-	  echo "<mv files end>: $working_files"
-	  echo "<verify_file>: $verify_file"
-	  
-	  if [ "$working_files" ] && [ ! -f "$verify_file" ]; then
-#	  if [ "$working_files" ]; then
-#20250216	  if [ "$working_files" ]; then
-	    echo "-=-=-=-=-=-=-=-=-=-=-=-=-="
-	    echo "pwd:<$(pwd)>"
-#	    echo "mkdir -p $verify_dir"
-#	    echo "cp -t $verify_dir $working_files"
-#	    mkdir -p "$verify_dir"
+      echo "<mv files end>: $working_files"
+      echo "<verify_file>: $verify_file"
+       
+      if [ "$working_files" ] && [ ! -f "$verify_file" ]; then
+#      if [ "$working_files" ]; then
+#20250216       if [ "$working_files" ]; then
+        echo "-=-=-=-=-=-=-=-=-=-=-=-=-="
+        echo "pwd:<$(pwd)>"
+#        echo "mkdir -p $verify_dir"
+#        echo "cp -t $verify_dir $working_files"
+#        echo "mkdir -p "$verify_dir"
 
             bash_cmd="mv -t \""${verify_dir}"\" "${working_files}""
             #20240213 bash_cmd="mv -t ""${verify_dir}"" "${working_files}""
@@ -346,11 +359,8 @@ echo "[Line:${LINENO}]"
             #"$bash_cmd"
 echo "[Line:${LINENO}]"
 
-	  fi
+      fi
 #########################################################################################
-
-
-
 
 
 
@@ -360,6 +370,25 @@ echo -e "${On_Blue}\n"
 echo -e "Complete: <${0}>"
 echo -e "${Color_Off}"
 #echo -e "${On_Blue}\nComplete: <${0}>${Color_Off}"
+
+# =======================================================
+# 20260113 [新增功能] 檢查是否有新的錯誤產生，並以紅底白字提示
+# =======================================================
+curr_err_count=0
+if [ -f "${error_log_file}" ]; then
+    curr_err_count=$(wc -l < "${error_log_file}")
+fi
+
+if [ "$curr_err_count" -gt "$init_err_count" ]; then
+    echo -e "${On_Red}${White}"
+    echo "################################################################"
+    echo " !!! 注意：腳本執行期間產生了新的錯誤記錄 !!! "
+    echo " 錯誤檔案: ${error_log_file}"
+    echo " 新增行數: $((curr_err_count - init_err_count)) 行"
+    echo "################################################################"
+    echo -e "${Color_Off}"
+fi
+# =======================================================
 
 echo "[Line:${LINENO}]"
 exit 0
